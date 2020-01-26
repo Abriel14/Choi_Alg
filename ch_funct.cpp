@@ -37,8 +37,7 @@ std::vector<std::vector<int>> find_max_faces(std::vector<int> pentagon){
     std::cout<<'\n';
     indexed_pentagon.push_back(vertice_range);
     index = index + k;
-    std::cout<<"test";
-  }
+  };
   std::cout<<"test";
   std::vector<std::vector<int>> maximal_faces;
   for(int k = 0; k<5; k++){
@@ -49,13 +48,6 @@ std::vector<std::vector<int>> find_max_faces(std::vector<int> pentagon){
   }
   return maximal_faces;
 }
-
-
-
-
-
-
-
 
 
 int main(){

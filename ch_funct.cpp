@@ -5,6 +5,7 @@
 using namespace std;
 
 int sum(vector<int>);
+void print_vect(vector<int>);
 
 
 vector<vector<int>> list_3_index(vector<int>, vector<int>, vector<int>);
@@ -21,22 +22,30 @@ vector<vector<int>> S;
 bool is_in(int, vector<int>);
 
 
+void print_vect(vector<int> v){
+  for(int x:v){
+    cout<<x<<',';
+    }
+  cout<<'\n';
+}
+
 
 void list_non_zero_elements(int i, vector<int> element){
-  if(i==element.size() && sum(element)!=0){
-    S.push_back(element);
+  if(i==element.size()){
+    if(sum(element)!=0){
+      S.push_back(element);
+    }
   }
   else{
-    vector<int> element1 = element;
+    vector<int> element1(element), element2(element);
     element1[i] +=1;
     list_non_zero_elements(i+1, element1);
-    vector<int> element2 = element;
     list_non_zero_elements(i+1, element2);
   }
 }
 
 int sum(vector<int> v){
-  int summand =0;
+  int summand = 0;
   for(int k : v)
     summand += k;
   return summand;
@@ -79,7 +88,6 @@ vector<vector<int>> index_pentagon(vector<int> pentagon){
   }
   return indexed_pentagon;
 }
-
 vector<vector<int>> find_max_faces(vector<vector<int>> indexed_pentagon){
   int m=indexed_pentagon[4].back()+1;
   vector<vector<int>> max_faces;
@@ -116,12 +124,13 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
   vector<vector<int>> max_faces = find_max_faces(indexed_pentagon);
   vector<vector<vector<int>>> list_lambdas;
   int m=indexed_pentagon[4].back()+1;
-  int n = m+3;
+  int n = m-3;
   vector<int> null_v;
-  for(int k=0;k<n;k++);
-    null_v.push_back(0);
+  null_v.assign(n,0);
   list_non_zero_elements(0,null_v);
-  int N = S.size();
+  for(auto v:S){
+    print_vect(v);
+  }
   vector<int> ref_max_face = max_faces[0];
   vector<int> compl_ref_max_face {indexed_pentagon[0][0], indexed_pentagon[1][0],indexed_pentagon[3][0]};
   vector<vector<int>> lambda_template;
@@ -135,7 +144,12 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
   vector<vector<int>> lambda = lambda_template;
   list_non_zero_elements(0, null_v);
   while(i!=-1){
-    vector<vector<int>> S_i = S;
+    vector<vector<int>> S_i;
+    for(auto v:S){
+      vector<int> v_cp(v);
+      S_i.push_back(v_cp);
+    }
+    cout<<S_i.size()<<'\n';
     for(vector<int> max_face : max_faces){
       if(is_in(compl_ref_max_face[0], max_face)){
         bool others_are_not = true;
@@ -157,8 +171,10 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
     while(S_i.size()!=0){
       lambda[compl_ref_max_face[i]] = S_i.back();
       S_i.pop_back();
-      if(i==2)
-        list_lambdas.push_back(lambda);
+      if(i==2){
+        vector<vector<int>> lambda_ins(lambda);
+        list_lambdas.push_back(lambda_ins);
+        }
       else{
         i=i+1;
         break;
@@ -172,7 +188,7 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
 
 
 int main(){
-  vector<int> pentagon1 {2,2,2,2,2};
+  vector<int> pentagon1 {1,1,1,1,1};
   vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
   cout<<list_lambdas.size()<<'\n';
 }

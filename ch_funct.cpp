@@ -31,7 +31,7 @@ void list_non_zero_elements(int i, vector<int> element){
     element1[i] +=1;
     list_non_zero_elements(i+1, element1);
     vector<int> element2 = element;
-    list_non_zero_elements(i+1, element1);
+    list_non_zero_elements(i+1, element2);
   }
 }
 
@@ -116,8 +116,6 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
   vector<vector<vector<int>>> list_lambdas;
   int m=indexed_pentagon[4].back()+1;
   int n = m+3;
-
-
   vector<int> null_v;
   for(int k=0;k<n;k++);
     null_v.push_back(0);
@@ -134,36 +132,38 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
     lambda_template[ref_max_face[k]][k] = 1;
   int i = 0;
   vector<vector<int>> lambda = lambda_template;
-  while(i!=n){
+  list_non_zero_elements(0, null_v);
+  while(i!=-1){
     vector<vector<int>> S_i = S;
-      for(vector<int> max_face : max_faces){
-        if(is_in(compl_ref_max_face[0], max_face)){
-          bool others_are_not = true;
-          for (int j = i+1;j<3;j++)
-            if(! is_in(compl_ref_max_face[j], max_face))
-              others_are_not = false;
-          if(others_are_not){
-            vector<int> sum_vector;
-            for(int k;k<n;k++)
-              sum_vector = sum_v(sum_vector,lambda[max_face[k]]);      
-            for(int S_index;S_index<S_i.size();S_index++){
-              if(S_i[S_index]==sum_vector){
-                S_i.erase(S_i.begin()+S_index);
-                }
+    for(vector<int> max_face : max_faces){
+      if(is_in(compl_ref_max_face[0], max_face)){
+        bool others_are_not = true;
+        for (int j = i+1;j<3;j++)
+          if(! is_in(compl_ref_max_face[j], max_face))
+            others_are_not = false;
+        if(others_are_not){
+          vector<int> sum_vector;
+          for(int k;k<n;k++)
+            sum_vector = sum_v(sum_vector,lambda[max_face[k]]);      
+          for(int S_index;S_index<S_i.size();S_index++){
+            if(S_i[S_index]==sum_vector){
+              S_i.erase(S_i.begin()+S_index);
               }
             }
           }
         }
-      while(S_i.size()!=0){
-          lambda[compl_ref_max_face[i]] = S_i.back();
-          S_i.pop_back();
-          if(i==2)
-            list_lambdas.push_back(lambda);
-          else{
-            i=i+1;
-            break;
-          }
+      }
+    while(S_i.size()!=0){
+      lambda[compl_ref_max_face[i]] = S_i.back();
+      S_i.pop_back();
+      if(i==2)
+        list_lambdas.push_back(lambda);
+      else{
+        i=i+1;
+        break;
         }
+      }
+    i=i-1;
     }
     return list_lambdas;
   }

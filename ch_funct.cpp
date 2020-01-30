@@ -46,6 +46,7 @@ vector<int> sum_v(vector<int> v1,vector<int> v2){
   vector<int> sum_vector;
   for(int k; k<v1.size();k++)
     sum_vector.push_back(v1[k] + v2[k]);
+  return sum_vector;
 }
 
 bool is_in(int x, vector<int> v){
@@ -143,7 +144,7 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
             others_are_not = false;
         if(others_are_not){
           vector<int> sum_vector;
-          for(int k;k<n;k++)
+          for(int k;k<max_face.size();k++)
             sum_vector = sum_v(sum_vector,lambda[max_face[k]]);      
           for(int S_index;S_index<S_i.size();S_index++){
             if(S_i[S_index]==sum_vector){
@@ -173,5 +174,5 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
 int main(){
   vector<int> pentagon1 {2,2,2,2,2};
   vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
-  cout<<list_lambdas.size();
+  cout<<list_lambdas.size()<<'\n';
 }

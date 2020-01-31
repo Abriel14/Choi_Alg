@@ -22,7 +22,8 @@ vector<vector<int>> S;
 
 bool is_invertible(vector<vector<int>> A){
   vector<vector<int>> B(A);
-  int m = B.size()/B[0].size();
+  int m = B.size();
+  cout<<m<<'\n';
   for(int k=0;k<m;k++){
     int i0=0;
     bool singular_mat = true;
@@ -34,22 +35,25 @@ bool is_invertible(vector<vector<int>> A){
     }
     if(singular_mat)
       return false;
-    vector<int> v_temp(B[0]);
-    B[0] = B[i0];
+    vector<int> v_temp(B[k]);
+    B[k] = B[i0];
     B[i0] = v_temp;
     for(int i = k+1;k<m;k++){
       if(B[i][k]==1){
         for(int j = k+1;j<m;j++){
-          B[i][j] = (B[i][j] + B[i0][j])%2;
+          B[i][j] = (B[i][j] + B[k][j])%2;
         }
       }
       B[i][k]=0;
     }
   }
+  for(auto v: B){
+    print_vect(v);
+  }
   int diag_sum = 0;
   for(int k=0;k<m;k++)
     diag_sum+=B[k][k];
-  return (diag_sum == B[0].size());
+  return (diag_sum == B.size());
 }
 
 bool is_in(int, vector<int>);
@@ -245,15 +249,23 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
   //   if(S_i.size()==0)
   //     i=i-1;
   //   }
-    return list_lambdas;
   }
 
 
 int main(){
-  vector<int> pentagon1 {2,1,1,1,1};
-  vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
-  vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
+  vector<int> v1 {1,0,0};
+  vector<int> v2 {0,1,0};
+  vector<int> v3 {0,0,1};
+  vector<vector<int>> M;
+  M.push_back(v1);
+  M.push_back(v2);
+  M.push_back(v3);
+  if(is_invertible(M))
+    cout<<"coucou"<<'\n';
+  // vector<int> pentagon1 {1,1,1,1,1};
+  // vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
+  // vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
 
-  vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
-  cout<<list_lambdas.size()<<'\n';
+  // vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
+  // cout<<list_lambdas.size()<<'\n';
 }

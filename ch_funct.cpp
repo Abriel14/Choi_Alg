@@ -215,7 +215,7 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
 
   vector<vector<vector<int>>> list_lambdas;
 
-  int m=indexed_pentagon[4].back()+1;//the number of vertices
+  int m=indexed_pentagon[4].back()+1;//the number of verticesA. GARRISON AND R. SCOTT
   int n = m-3;//dimension of the polytope
 
   //creation of the null vector
@@ -243,7 +243,6 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
   int i = 0;
 
   while(i!=-1){
-    cout<<list_lambdas.size()<<'\n';
     for(vector<int> max_face : max_faces){
       //if the treatin index is in the max face
       if(is_in(compl_ref_max_face[i], max_face)){
@@ -286,7 +285,8 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
       }
     //if we emptied the list of vectors, it means we should replace it with a new one and come back to the last vector treated  
     if(list_S[i].size()==0){
-      list_S[i] = S;
+      if(i!=0)
+        list_S[i] = S;
       i=i-1;
       }
     }
@@ -296,7 +296,7 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
 
 
 int main(){
-  vector<int> pentagon1 {3,3,3,3,3};
+  vector<int> pentagon1 {2,1,1,1,1};
   vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
   vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
 

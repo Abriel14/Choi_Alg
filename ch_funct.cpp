@@ -3,37 +3,14 @@
 #include <string>
 #include <iostream>
 #include <thread>
-#include <future>
-#include <algorithm> 
-#include <functional>
-#include <pthread.h>
+#include <algorithm>
+#include "ch_funct.h"
 
 using namespace std;
 
 // void to_thread(bool&,vector<int>,vector<vector<int>>);
 int thread_nbr = 8;
-int sum(vector<int>);
-void print_vect(vector<int>);
-
-
-vector<vector<int>> list_3_index(vector<int>, vector<int>, vector<int>);
-vector<vector<int>> index_pentagon(vector<int>);
-vector<vector<int>> find_max_faces(vector<vector<int>>);
-vector<vector<int>> find_min_non_faces(vector<vector<int>>);
-
-vector<int> sum_v(vector<int>,vector<int>);
-bool is_invertible(vector<vector<int>>);
-
-vector<vector<vector<int>>> compute_chr_funct(vector<int>);
-void list_non_zero_elements(int, vector<int>);
 vector<vector<int>> S;
-
-void remove_all_lin_span(vector<vector<int>>&,vector<vector<int>>,vector<int>);
-
-
-bool is_in(int, vector<int>);
-bool vector_is_in(vector<int>,vector<vector<int>>);
-
 
 vector<vector<int>> list_3_index(vector<int> a,vector<int> b, vector<int> c){
   vector<vector<int>> list_index;

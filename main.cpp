@@ -9,15 +9,6 @@
 using namespace std;
 
 
-class Z2_polynoms
-{
-private:
-    int N;
-    vector<vector<int>> coeff;
-public:
-    Z2_polynoms(/* args */);
-    ~Z2_polynoms();
-};
 
 Z2_polynoms::Z2_polynoms(/* args */)
 {

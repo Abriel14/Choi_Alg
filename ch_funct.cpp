@@ -2,8 +2,16 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <thread>
+#include <future>
+#include <algorithm> 
+#include <functional>
+#include <pthread.h>
+
 using namespace std;
 
+// void to_thread(bool&,vector<int>,vector<vector<int>>);
+int thread_nbr = 8;
 int sum(vector<int>);
 void print_vect(vector<int>);
 
@@ -20,10 +28,16 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int>);
 void list_non_zero_elements(int, vector<int>);
 vector<vector<int>> S;
 
+void remove_all_lin_span(vector<vector<int>>&,vector<vector<int>>,vector<int>);
+
+
+bool is_in(int, vector<int>);
+bool vector_is_in(vector<int>,vector<vector<int>>);
+void rm_vect_from_list(vector<int> ,vector<vector<int>>&);
+
 bool is_invertible(vector<vector<int>> A){
   vector<vector<int>> B(A);
   int m = B.size();
-  cout<<m<<'\n';
   for(int k=0;k<m;k++){
     int i0=0;
     bool singular_mat = true;
@@ -33,22 +47,20 @@ bool is_invertible(vector<vector<int>> A){
         i0=i;
       }
     }
-    if(singular_mat)
+    if(singular_mat){
       return false;
+    }
     vector<int> v_temp(B[k]);
     B[k] = B[i0];
     B[i0] = v_temp;
-    for(int i = k+1;k<m;k++){
+    for(int i = k+1;i<m;i++){
       if(B[i][k]==1){
         for(int j = k+1;j<m;j++){
           B[i][j] = (B[i][j] + B[k][j])%2;
         }
       }
-      B[i][k]=0;
+      B[i][k] = 0;
     }
-  }
-  for(auto v: B){
-    print_vect(v);
   }
   int diag_sum = 0;
   for(int k=0;k<m;k++)
@@ -56,7 +68,6 @@ bool is_invertible(vector<vector<int>> A){
   return (diag_sum == B.size());
 }
 
-bool is_in(int, vector<int>);
 
 
 void print_vect(vector<int> v){
@@ -95,9 +106,18 @@ vector<int> sum_v(vector<int> v1,vector<int> v2){
   return sum_vector;
 }
 
+void rm_vect_from_list(vector<int> v,vector<vector<int>>& list_v){
+  int n = list_v.size();
+  for(int k=0;k<n;k++){
+    if(list_v[k]==v){
+      list_v.erase(list_v.begin()+k);
+      }
+    }
+}
+
 bool is_in(int x, vector<int> v){
   for(int k:v){
-    if(k=x)
+    if(k==x)
       return true;
     }
   return false;
@@ -155,117 +175,137 @@ vector<vector<int>> find_min_non_faces(vector<vector<int>> indexed_pentagon){
   return min_non_faces;
 }
 
+// void to_thread(bool& test,vector<int> max_face,vector<vector<int>> lambda_test){
+//   vector<vector<int>> M_test;
+//   for(int index: max_face){
+//     M_test.push_back(lambda_test[index]);
+//   }
+//   if(! is_invertible(M_test)){
+//     test &= false;
+//     }
+// }
+
+
+
+void remove_all_lin_span(vector<vector<int>>& T,vector<vector<int>> list_vectors, vector<int> lin_span){
+  //Given a list of vectors, this function erases from this list every Z2 linear spans of it.
+  if(list_vectors.size()==0){
+    int n = (T).size();
+    for(int k = 0;k<n;k++){
+      if((T)[k]==lin_span){
+        (T).erase((T).begin()+k);
+        break;
+      }
+    }
+  }
+  else
+  {
+    vector<int> v(list_vectors.back());
+    list_vectors.pop_back();
+    remove_all_lin_span(T,list_vectors,lin_span);
+    remove_all_lin_span(T,list_vectors,sum_v(v,lin_span));
+  }
+}
 
 vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
+
   vector<vector<int>> indexed_pentagon = index_pentagon(pentagon);
   vector<vector<int>> min_non_faces = find_min_non_faces(indexed_pentagon);
   vector<vector<int>> max_faces = find_max_faces(indexed_pentagon);
+
   vector<vector<vector<int>>> list_lambdas;
-  int m=indexed_pentagon[4].back()+1;
-  int n = m-3;
+
+  int m=indexed_pentagon[4].back()+1;//the number of vertices
+  int n = m-3;//dimension of the polytope
+
+  //creation of the null vector
   vector<int> null_v;
   null_v.assign(n,0);
   list_non_zero_elements(0,null_v);
+
+  //the reference maximal face (we put the canonical basis in the rows of the characterisic function)
   vector<int> ref_max_face = max_faces[0];
   vector<int> compl_ref_max_face {indexed_pentagon[0][0], indexed_pentagon[1][0],indexed_pentagon[3][0]};
+
+  //We create the template for the characteristic function
   vector<vector<int>> lambda_template;
   lambda_template.assign(m,null_v);
   for(int k=0; k<n;k++){
     lambda_template[ref_max_face[k]][k] = 1;
     }
-  int i = 0;
-  list_non_zero_elements(0, null_v);
+  
   vector<vector<int>> lambda(lambda_template);
-  /* For every vectors in Z2, we test if the lambda function lambda_test verifies the condition*/
-  for(auto v1:S){
-    for(auto v2:S){
-      for(auto v3:S){
-        //initialize the lambda_test
-        vector<vector<int>> lambda_test(lambda_template);
-        lambda_test[ref_max_face[0]] = v1;
-        lambda_test[ref_max_face[1]] = v2;
-        lambda_test[ref_max_face[2]] = v3;
-        /*We test here all maximal faces and see if the restricted rows are linearly independant*/
-        bool respects_def = true;
-        for(auto max_face:max_faces){
-          vector<vector<int>> M_test;
-          for(int index: max_face){
-            M_test.push_back(lambda_test[index]);
+  vector<vector<vector<int>>> list_S;//list of all the possibilities for the three vectors
+  for(auto k:compl_ref_max_face){
+    vector<vector<int>> S_cp(S);
+    list_S.push_back(S_cp);
+  }
+  int i = 0;
+
+  while(i!=-1){
+    cout<<list_lambdas.size()<<'\n';
+    for(vector<int> max_face : max_faces){
+      //if the treatin index is in the max face
+      if(is_in(compl_ref_max_face[i], max_face)){
+        bool others_are_not = true;
+        //we test if the afterward other indexes are not there
+        for (int j = i+1;j<3;j++){
+          if(is_in(compl_ref_max_face[j], max_face)){
+            others_are_not = false;}
           }
-          if(!is_invertible(M_test)){
-            respects_def = false;
-            break;
-          }
-          else
-          {
-            list_lambdas.push_back(lambda_test);
+        //if they are not in the max face then the conditions are satisfied
+        if(others_are_not){
+          //we create the list of the vectors we will remove the span in the list list_S[i]
+          vector<vector<int>> list_vectors;
+          for(int k:max_face){
+            //if the index is not the one of the treating vector (it must be linearly independant from the ones in the max face which contains it),
+            if(k!=compl_ref_max_face[i]){
+              vector<int> vect_to_add(lambda[k]);
+              list_vectors.push_back(vect_to_add);
+              }
+            }
+          //We remove from the list list_S[i] all the span of the list_vectors
+          remove_all_lin_span(list_S[i],list_vectors,null_v);
           }
         }
       }
+    while(list_S[i].size()!=0){
+      //We put the last vector of the list in the current lambda function at the index i
+      lambda[compl_ref_max_face[i]] = list_S[i].back();
+      list_S[i].pop_back();
+      //if it is the last possible vector to add, it means we just should fill lambda with the working vectors
+      if(i==2){
+        vector<vector<int>> lambda_ins(lambda);
+        list_lambdas.push_back(lambda_ins);
+        }
+      //otherwise, we must analyze the next vector possible according to the one we put just before
+      else{
+        i=i+1;
+        break;
+        }
+      }
+    //if we emptied the list of vectors, it means we should replace it with a new one and come back to the last vector treated  
+    if(list_S[i].size()==0){
+      list_S[i] = S;
+      i=i-1;
+      }
     }
-  }
   return list_lambdas;
-  // while(i!=-1){
-  //   vector<vector<int>> S_i(S);
-  //   for(vector<int> max_face : max_faces){
-  //     if(is_in(compl_ref_max_face[i], max_face)){
-  //       bool others_are_not = true;
-  //       for (int j = i+1;j<3;j++){
-  //         if(! is_in(compl_ref_max_face[j], max_face))
-  //           others_are_not = false;
-  //         }
-  //       if(others_are_not){
-  //         vector<int> sum_vector(null_v);
-  //         for(int l=0;l<max_face.size();l++){
-  //           sum_vector = sum_v(sum_vector,lambda[max_face[l]]);
-  //         }
-  //         for(int S_index=0;S_index<S_i.size()/(S_i[0].size());S_index++){
-  //           cout<<S_index<<'\n';
-  //           if(S_i[S_index]==sum_vector){              
-  //             S_i.erase(S_i.begin()+S_index);
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   while(S_i.size()!=0){
-  //     lambda[compl_ref_max_face[i]] = S_i.back();
-  //     S_i.pop_back();
-  //     if(i==2){
-  //       vector<vector<int>> lambda_ins(lambda);
-  //       bool is_already_here = false;
-  //       for(auto lambda_test:list_lambdas){
-  //         if(lambda_test==lambda_ins)
-  //           is_already_here = true;
-  //       }
-  //       if(! is_already_here)
-  //         list_lambdas.push_back(lambda_ins);
-  //       }
-  //     else{
-  //       i=i+1;
-  //       break;
-  //       }
-  //     }
-  //   if(S_i.size()==0)
-  //     i=i-1;
-  //   }
   }
+  
 
 
 int main(){
-  vector<int> v1 {1,0,0};
-  vector<int> v2 {0,1,0};
-  vector<int> v3 {0,0,1};
-  vector<vector<int>> M;
-  M.push_back(v1);
-  M.push_back(v2);
-  M.push_back(v3);
-  if(is_invertible(M))
-    cout<<"coucou"<<'\n';
-  // vector<int> pentagon1 {1,1,1,1,1};
-  // vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
-  // vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
+  vector<int> pentagon1 {3,3,3,3,3};
+  vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
+  vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
 
-  // vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
-  // cout<<list_lambdas.size()<<'\n';
+  vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
+  // for(auto lambda:list_lambdas){
+  //   for(auto v:lambda){
+  //     print_vect(v);      
+  //   }
+  //   cout<<"new"<<'\n';
+  // }
+  cout<<list_lambdas.size()<<'\n';
 }

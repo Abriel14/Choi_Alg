@@ -33,95 +33,7 @@ void remove_all_lin_span(vector<vector<int>>&,vector<vector<int>>,vector<int>);
 
 bool is_in(int, vector<int>);
 bool vector_is_in(vector<int>,vector<vector<int>>);
-void rm_vect_from_list(vector<int> ,vector<vector<int>>&);
 
-bool is_invertible(vector<vector<int>> A){
-  vector<vector<int>> B(A);
-  int m = B.size();
-  for(int k=0;k<m;k++){
-    int i0=0;
-    bool singular_mat = true;
-    for(int i=k;i<m;i++){
-      if(B[i][k]!=0){
-        singular_mat = false;
-        i0=i;
-      }
-    }
-    if(singular_mat){
-      return false;
-    }
-    vector<int> v_temp(B[k]);
-    B[k] = B[i0];
-    B[i0] = v_temp;
-    for(int i = k+1;i<m;i++){
-      if(B[i][k]==1){
-        for(int j = k+1;j<m;j++){
-          B[i][j] = (B[i][j] + B[k][j])%2;
-        }
-      }
-      B[i][k] = 0;
-    }
-  }
-  int diag_sum = 0;
-  for(int k=0;k<m;k++)
-    diag_sum+=B[k][k];
-  return (diag_sum == B.size());
-}
-
-
-
-void print_vect(vector<int> v){
-  for(int x:v){
-    cout<<x<<',';
-    }
-  cout<<'\n';
-}
-
-
-void list_non_zero_elements(int i, vector<int> element){
-  if(i==element.size()){
-    if(sum(element)!=0){
-      S.push_back(element);
-    }
-  }
-  else{
-    vector<int> element1(element), element2(element);
-    element1[i] +=1;
-    list_non_zero_elements(i+1, element1);
-    list_non_zero_elements(i+1, element2);
-  }
-}
-
-int sum(vector<int> v){
-  int summand = 0;
-  for(int k : v)
-    summand += k;
-  return summand;
-}
-
-vector<int> sum_v(vector<int> v1,vector<int> v2){
-  vector<int> sum_vector;
-  for(int k=0; k<v1.size();k++)
-    sum_vector.push_back((v1[k] + v2[k])%2);
-  return sum_vector;
-}
-
-void rm_vect_from_list(vector<int> v,vector<vector<int>>& list_v){
-  int n = list_v.size();
-  for(int k=0;k<n;k++){
-    if(list_v[k]==v){
-      list_v.erase(list_v.begin()+k);
-      }
-    }
-}
-
-bool is_in(int x, vector<int> v){
-  for(int k:v){
-    if(k==x)
-      return true;
-    }
-  return false;
-}
 
 vector<vector<int>> list_3_index(vector<int> a,vector<int> b, vector<int> c){
   vector<vector<int>> list_index;
@@ -174,6 +86,87 @@ vector<vector<int>> find_min_non_faces(vector<vector<int>> indexed_pentagon){
   min_non_faces.push_back(current_min_non_face);
   return min_non_faces;
 }
+
+// bool is_invertible(vector<vector<int>> A){
+//   vector<vector<int>> B(A);
+//   int m = B.size();
+//   for(int k=0;k<m;k++){
+//     int i0=0;
+//     bool singular_mat = true;
+//     for(int i=k;i<m;i++){
+//       if(B[i][k]!=0){
+//         singular_mat = false;
+//         i0=i;
+//       }
+//     }
+//     if(singular_mat){
+//       return false;
+//     }
+//     vector<int> v_temp(B[k]);
+//     B[k] = B[i0];
+//     B[i0] = v_temp;
+//     for(int i = k+1;i<m;i++){
+//       if(B[i][k]==1){
+//         for(int j = k+1;j<m;j++){
+//           B[i][j] = (B[i][j] + B[k][j])%2;
+//         }
+//       }
+//       B[i][k] = 0;
+//     }
+//   }
+//   int diag_sum = 0;
+//   for(int k=0;k<m;k++)
+//     diag_sum+=B[k][k];
+//   return (diag_sum == B.size());
+// }
+
+
+
+void print_vect(vector<int> v){
+  for(int x:v){
+    cout<<x<<',';
+    }
+  cout<<'\n';
+}
+
+
+void list_non_zero_elements(int i, vector<int> element){
+  if(i==element.size()){
+    if(sum(element)!=0){
+      S.push_back(element);
+    }
+  }
+  else{
+    vector<int> element1(element), element2(element);
+    element1[i] +=1;
+    list_non_zero_elements(i+1, element1);
+    list_non_zero_elements(i+1, element2);
+  }
+}
+
+int sum(vector<int> v){
+  int summand = 0;
+  for(int k : v)
+    summand += k;
+  return summand;
+}
+
+vector<int> sum_v(vector<int> v1,vector<int> v2){
+  vector<int> sum_vector;
+  for(int k=0; k<v1.size();k++)
+    sum_vector.push_back((v1[k] + v2[k])%2);
+  return sum_vector;
+}
+
+bool is_in(int x, vector<int> v){
+  for(int k:v){
+    if(k==x)
+      return true;
+    }
+  return false;
+}
+
+
 
 // void to_thread(bool& test,vector<int> max_face,vector<vector<int>> lambda_test){
 //   vector<vector<int>> M_test;
@@ -250,7 +243,8 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
         //we test if the afterward other indexes are not there
         for (int j = i+1;j<3;j++){
           if(is_in(compl_ref_max_face[j], max_face)){
-            others_are_not = false;}
+            others_are_not = false;
+            }
           }
         //if they are not in the max face then the conditions are satisfied
         if(others_are_not){
@@ -285,8 +279,7 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
       }
     //if we emptied the list of vectors, it means we should replace it with a new one and come back to the last vector treated  
     if(list_S[i].size()==0){
-      if(i!=0)
-        list_S[i] = S;
+      list_S[i] = S;
       i=i-1;
       }
     }
@@ -296,10 +289,9 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
 
 
 int main(){
-  vector<int> pentagon1 {2,1,1,1,1};
+  vector<int> pentagon1 {3,3,3,3,2};
   vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
   vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
-
   vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
   // for(auto lambda:list_lambdas){
   //   for(auto v:lambda){

@@ -1,5 +1,5 @@
-#ifndef POINT_H
-#define POINT_H
+#ifndef Z2_POLYNOM_H
+#define Z2_POLYNOM_H
 
 #include <vector>
 #include <iostream>
@@ -9,8 +9,8 @@ class Z2_polynom
 {
 private:
     int N;
-    vector<vector<int>> monoms;
 public:
+    vector<vector<int>> monoms;
     Z2_polynom(int N);
     Z2_polynom(int N,vector<vector<int>> monoms);
     ~Z2_polynom();

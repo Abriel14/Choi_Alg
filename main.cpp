@@ -10,13 +10,7 @@ using namespace std;
 
 
 
-Z2_polynoms::Z2_polynoms(/* args */)
-{
-}
 
-Z2_polynoms::~Z2_polynoms()
-{
-}
 
 
 

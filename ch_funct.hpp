@@ -1,3 +1,8 @@
+#ifndef CH_FUNCT_H
+#define CH_FUNCT_H
+
+#include <vector>
+
 using namespace std;
 
 int sum(vector<int>);
@@ -20,3 +25,5 @@ void remove_all_lin_span(vector<vector<int>>&,vector<vector<int>>,vector<int>);
 
 bool is_in(int, vector<int>);
 bool vector_is_in(vector<int>,vector<vector<int>>);
+
+#endif

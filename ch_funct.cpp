@@ -4,7 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <algorithm>
-#include "ch_funct.h"
+#include "ch_funct.hpp"
 
 using namespace std;
 
@@ -20,7 +20,6 @@ vector<vector<int>> list_3_index(vector<int> a,vector<int> b, vector<int> c){
         list_index.push_back(vector<int> {i,j,k});
   return list_index;
 }
-
 vector<vector<int>> index_pentagon(vector<int> pentagon){
   vector<vector<int>> indexed_pentagon;
   int index = 0;
@@ -265,16 +264,3 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
   
 
 
-int main(){
-  vector<int> pentagon1 {3,3,3,3,2};
-  vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
-  vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
-  vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
-  // for(auto lambda:list_lambdas){
-  //   for(auto v:lambda){
-  //     print_vect(v);      
-  //   }
-  //   cout<<"new"<<'\n';
-  // }
-  cout<<list_lambdas.size()<<'\n';
-}

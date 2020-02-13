@@ -1,8 +1,8 @@
 #include <vector>
 #include <iostream>
-#include "Z2_polynoms.h"
-#include "ch_funct.h"
+#include "Z2_polynoms.hpp"
 #include <algorithm>
+
 using namespace std;
 
 vector<vector<int>> fusion(vector<vector<int>>,vector<vector<int>>);
@@ -39,12 +39,45 @@ Z2_polynom::Z2_polynom(int n,vector<vector<int>> list_of_monoms){
     sort(list_of_monoms.begin(),list_of_monoms.end());
     monoms = list_of_monoms;
     N = n;
+
+}
+
+Z2_polynom::~Z2_polynom(){
 }
 
 Z2_polynom Z2_polynom::operator+(const Z2_polynom &P){
-    this->monoms = fusion(this->monoms,P.monoms);
+    vector<vector<int>> add_result;
+    add_result = fusion(this->monoms,P.monoms);
+    Z2_polynom result(this->N,add_result);
+    return result;
 }
 
-Z2_polynom Z2_polynom::operator+(const Z2_polynom &P){
-    
+
+Z2_polynom Z2_polynom::operator*(const Z2_polynom &P){
+    vector<vector<int>> mult_result;
+    Z2_polynom result(this->N,mult_result);
+    for(vector<int> monom: this->monoms){
+        vector<vector<int>> list_multiplied_monoms;
+        for(vector<int> monom_to_multiply:P.monoms){
+            vector<int> multiplied_monom;
+            for(int k;k<this->N;k++){
+                multiplied_monom.push_back(monom[k]+monom_to_multiply[k]);
+            }
+            list_multiplied_monoms.push_back(multiplied_monom);
+        }
+        Z2_polynom multiplied_polynom(this->N,list_multiplied_monoms);
+        result = result + multiplied_polynom;
+    }
+    return result;
+}
+
+void Z2_polynom::display_monoms(){
+    for(vector<int> monom: this->monoms){
+        cout<<'{';
+        for(int k:monom){
+            cout<<k<<',';
+        }
+        cout<<'}'<<'\n';
+    }
+
 }

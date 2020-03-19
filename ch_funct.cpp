@@ -8,9 +8,52 @@
 
 using namespace std;
 
-// void to_thread(bool&,vector<int>,vector<vector<int>>);
 int thread_nbr = 8;
 vector<vector<int>> S;
+
+
+void print_vect(vector<int> v){
+  for(int x:v){
+    cout<<x<<',';
+    }
+  cout<<'\n';
+}
+
+void list_non_zero_elements(int i, vector<int> element){
+  if(i==element.size()){
+    if(sum(element)!=0){
+      S.push_back(element);
+    }
+  }
+  else{
+    vector<int> element1(element), element2(element);
+    element1[i] +=1;
+    list_non_zero_elements(i+1, element1);
+    list_non_zero_elements(i+1, element2);
+  }
+}
+
+int sum(vector<int> v){
+  int summand = 0;
+  for(int k : v)
+    summand += k;
+  return summand;
+}
+
+vector<int> sum_v(vector<int> v1,vector<int> v2){
+  vector<int> sum_vector;
+  for(int k=0; k<v1.size();k++)
+    sum_vector.push_back((v1[k] + v2[k])%2);
+  return sum_vector;
+}
+
+bool is_in(int x, vector<int> v){
+  for(int k:v){
+    if(k==x)
+      return true;
+    }
+  return false;
+}
 
 vector<vector<int>> list_3_index(vector<int> a,vector<int> b, vector<int> c){
   vector<vector<int>> list_index;
@@ -62,99 +105,6 @@ vector<vector<int>> find_min_non_faces(vector<vector<int>> indexed_pentagon){
   min_non_faces.push_back(current_min_non_face);
   return min_non_faces;
 }
-
-// bool is_invertible(vector<vector<int>> A){
-//   vector<vector<int>> B(A);
-//   int m = B.size();
-//   for(int k=0;k<m;k++){
-//     int i0=0;
-//     bool singular_mat = true;
-//     for(int i=k;i<m;i++){
-//       if(B[i][k]!=0){
-//         singular_mat = false;
-//         i0=i;
-//       }
-//     }
-//     if(singular_mat){
-//       return false;
-//     }
-//     vector<int> v_temp(B[k]);
-//     B[k] = B[i0];
-//     B[i0] = v_temp;
-//     for(int i = k+1;i<m;i++){
-//       if(B[i][k]==1){
-//         for(int j = k+1;j<m;j++){
-//           B[i][j] = (B[i][j] + B[k][j])%2;
-//         }
-//       }
-//       B[i][k] = 0;
-//     }
-//   }
-//   int diag_sum = 0;
-//   for(int k=0;k<m;k++)
-//     diag_sum+=B[k][k];
-//   return (diag_sum == B.size());
-// }
-
-
-
-void print_vect(vector<int> v){
-  for(int x:v){
-    cout<<x<<',';
-    }
-  cout<<'\n';
-}
-
-
-void list_non_zero_elements(int i, vector<int> element){
-  if(i==element.size()){
-    if(sum(element)!=0){
-      S.push_back(element);
-    }
-  }
-  else{
-    vector<int> element1(element), element2(element);
-    element1[i] +=1;
-    list_non_zero_elements(i+1, element1);
-    list_non_zero_elements(i+1, element2);
-  }
-}
-
-int sum(vector<int> v){
-  int summand = 0;
-  for(int k : v)
-    summand += k;
-  return summand;
-}
-
-vector<int> sum_v(vector<int> v1,vector<int> v2){
-  vector<int> sum_vector;
-  for(int k=0; k<v1.size();k++)
-    sum_vector.push_back((v1[k] + v2[k])%2);
-  return sum_vector;
-}
-
-bool is_in(int x, vector<int> v){
-  for(int k:v){
-    if(k==x)
-      return true;
-    }
-  return false;
-}
-
-
-
-// void to_thread(bool& test,vector<int> max_face,vector<vector<int>> lambda_test){
-//   vector<vector<int>> M_test;
-//   for(int index: max_face){
-//     M_test.push_back(lambda_test[index]);
-//   }
-//   if(! is_invertible(M_test)){
-//     test &= false;
-//     }
-// }
-
-
 
 void remove_all_lin_span(vector<vector<int>>& T,vector<vector<int>> list_vectors, vector<int> lin_span){
   //Given a list of vectors, this function erases from this list every Z2 linear spans of it.

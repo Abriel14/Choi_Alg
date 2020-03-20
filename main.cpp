@@ -10,8 +10,8 @@
 //FGB module
 #define LIBMODE 1
 #define CALL_FGB_DO_NOT_DEFINE
-#include "call_fgb.h"
-#include "gmp.h"
+#include "call_FGb/nv/maple/C/call_fgb.h"
+#include "call_FGb/nv/int/gmp.h"
 #define FGb_MAXI_BASE 100000
 
 

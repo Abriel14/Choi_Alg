@@ -7,8 +7,8 @@ class Z2_polynom
 {
 private:
     int N;
-    vector<vector<int>> monoms;
 public:
+    vector<vector<int>> monoms;
     Z2_polynom(int n);
     Z2_polynom(int n,vector<vector<int>> list_of_monoms);
     void display_monoms();

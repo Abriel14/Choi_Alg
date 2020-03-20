@@ -2,8 +2,8 @@ CFLAGS := -m64 -g
 CFLAGS := -m64 
 CC:=gcc $(CFLAGS)
 CPP:=g++ $(CFLAGS)
+LIBDIR := macosx
 LIBDIR := x64
-GMP_STATIC_DIR:=/usr/local/lib/.libs
 
 # ----------------------------------------------------------------------
 #

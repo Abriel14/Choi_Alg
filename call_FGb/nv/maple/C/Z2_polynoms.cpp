@@ -1,7 +1,5 @@
-#include <vector>
-#include <iostream>
 #include "Z2_polynoms.hpp"
-#include <algorithm>
+
 
 using namespace std;
 

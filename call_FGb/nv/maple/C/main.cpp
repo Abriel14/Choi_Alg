@@ -1,3 +1,5 @@
+using namespace std;
+
 #include <stdio.h>
 #include <vector>
 #include <string>
@@ -15,6 +17,7 @@
 #include "call_fgb_basic.h"
 #include "gmp.h"
 #define FGb_MAXI_BASE 100000
+
 
 static void process_memory_state()
 {
@@ -38,7 +41,6 @@ static void process_memory_state()
 
 vector<Z2_polynom> compute_GB(vector<Z2_polynom>);
 
-using namespace std;
 
 vector<Z2_polynom> find_polynoms(vector<vector<int>>,vector<vector<int>>,vector<vector<int>>,vector<vector<int>>);
 
@@ -201,14 +203,14 @@ vector<Z2_polynom> compute_GB(vector<Z2_polynom> I){
 
   
   FGB(reset_memory)(); /* to reset Memory */
-  FGB(restoreptr)(); /* restore original GMP allocators */*
+  FGB(restoreptr)(); /* restore original GMP allocators */
   return I;
 }
 
 
 
 int main(){
-    vector<int> pentagon1 {3,3,3,3,3};
+    vector<int> pentagon1 {1,1,1,1,1};
     vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
     vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
     vector<vector<int>> min_non_faces = find_min_non_faces(pentagon1_indexed);

@@ -9,7 +9,7 @@
                 "${workspaceFolder}/call_FGb/nv/protocol/style.h"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "/bin/g++",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "browse": {

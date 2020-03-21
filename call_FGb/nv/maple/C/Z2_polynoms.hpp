@@ -1,7 +1,11 @@
 #ifndef Z2_POLYNOMS_H
 #define Z2_POLYNOMS_H
-
 using namespace std;
+#include <vector>
+#include <iostream>
+#include <algorithm>
+
+
 
 class Z2_polynom
 {

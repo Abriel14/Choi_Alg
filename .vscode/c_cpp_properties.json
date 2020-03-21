@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/call_FGb/nv/maple/C/**",
+                "${workspaceFolder}/call_FGb/nv/int/protocol_mapple.h",
+                "${workspaceFolder}/call_FGb/nv/protocol/style.h"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/call_FGb/nv/maple/C/x64/"
+                ]
+            }
+        }
+    ],
+    "version": 4
+}

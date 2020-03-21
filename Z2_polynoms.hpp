@@ -7,8 +7,8 @@ class Z2_polynom
 {
 private:
     int N;
-public:
     vector<vector<int>> monoms;
+public:
     Z2_polynom(int n);
     Z2_polynom(int n,vector<vector<int>> list_of_monoms);
     void display_monoms();
@@ -16,6 +16,8 @@ public:
     Z2_polynom operator+(const Z2_polynom & P);
     Z2_polynom operator*(const Z2_polynom & P);
     bool is_null();
+    vector<int> LT();
+    Z2_polynom S_pol(const Z2_polynom & P);
 };
 
 #endif

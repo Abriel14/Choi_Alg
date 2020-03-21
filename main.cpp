@@ -70,7 +70,7 @@ vector<Z2_polynom> find_polynoms(vector<vector<int>> lambda_funct,vector<vector<
 
 
 int main(){
-    vector<int> pentagon1 {1,1,1,1,1};
+    vector<int> pentagon1 {10,1,1,1,1};
     vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
     vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
     vector<vector<int>> min_non_faces = find_min_non_faces(pentagon1_indexed);

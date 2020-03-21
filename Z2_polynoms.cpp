@@ -7,6 +7,29 @@ using namespace std;
 
 vector<vector<int>> fusion(vector<vector<int>>,vector<vector<int>>);
 
+bool mon_order(vector<int>,vector<int>);
+
+bool mon_order(vector<int> mon1,vector<int> mon2){
+    int a,b;
+    for(int k:mon1){
+        a+=k;
+    }
+    for(int k:mon2){
+        b+=k;
+    }
+    if(a>b){
+        return true;
+    }
+    else{
+        int k=mon1.size()-1;
+        while( k>=0 && (mon1[k] - mon2[k]==0)){
+            k+=1;
+        }
+        return (mon1[k] - mon2[k] < 0);
+        }
+    }
+
+
 vector<vector<int>> fusion(vector<vector<int>> l1,vector<vector<int>> l2){
     int n1 = l1.size();
     int n2 = l2.size();
@@ -18,12 +41,11 @@ vector<vector<int>> fusion(vector<vector<int>> l1,vector<vector<int>> l2){
             i1+=1;
             i2+=1;
         }
-        else{ if(l1[i1]<l2[i2]){
+        else{if(mon_order(l1[i1],l2[i2])){
             result.push_back(l1[i1]);
             i1+=1;
         }
-        else{
-        if(l2[i2]<l1[i1]){
+        else{if(mon_order(l2[i2],l1[i1])){
             result.push_back(l2[i2]);
             i2+=1;
         }
@@ -38,12 +60,14 @@ vector<vector<int>> fusion(vector<vector<int>> l1,vector<vector<int>> l2){
 }
 
 
+
+
 Z2_polynom::Z2_polynom(int n,vector<vector<int>> list_of_monoms){
-    sort(list_of_monoms.begin(),list_of_monoms.end());
+    sort(list_of_monoms.begin(),list_of_monoms.end(),mon_order);
     monoms = list_of_monoms;
     N = n;
-
 }
+
 Z2_polynom::Z2_polynom(int n){
     N = n;
     vector<vector<int>> m;
@@ -93,4 +117,12 @@ void Z2_polynom::display_monoms(){
         cout<<'}'<<'\n';
     }
 
+}
+
+vector<int> Z2_polynom::LT(){
+    return this->monoms[0];
+}
+
+Z2_polynom Z2_polynom::S_pol(const Z2_polynom & P){
+    vector<int> LT1
 }

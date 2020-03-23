@@ -70,14 +70,20 @@ vector<Z2_polynom> find_polynoms(vector<vector<int>> lambda_funct,vector<vector<
 
 
 int main(){
-    vector<int> pentagon1 {10,1,1,1,1};
+    vector<int> pentagon1 {2,2,2,2,2};
     vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
     vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
     vector<vector<int>> min_non_faces = find_min_non_faces(pentagon1_indexed);
     vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
-    vector<Z2_polynom> I = find_polynoms(list_lambdas[0],max_faces,min_non_faces,pentagon1_indexed);
+    vector<Z2_polynom> I = find_polynoms(list_lambdas[1],max_faces,min_non_faces,pentagon1_indexed);
     cout<<I.size()<<'\n';
     for(auto P:I){
+        cout<<"new"<<'\n';
+        P.display_monoms();
+    }
+    cout <<"------------"<<'\n';
+    vector<Z2_polynom> J = Buchberger(I);
+    for(auto P:J){
         cout<<"new"<<'\n';
         P.display_monoms();
     }

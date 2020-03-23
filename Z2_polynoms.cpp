@@ -26,9 +26,9 @@ bool mon_order(vector<int> mon1,vector<int> mon2){
     else{
         int k=mon1.size()-1;
         while( k>=0 && (mon1[k] - mon2[k]==0)){
-            k+=1;
+            k-=1;
         }
-        return (mon1[k] - mon2[k] < 0);
+        return k>=0 && (mon1[k] - mon2[k] < 0);
         }
     }
 
@@ -39,7 +39,7 @@ vector<vector<int>> fusion(vector<vector<int>> l1,vector<vector<int>> l2){
     vector<vector<int>> result;
     int i1 = 0;
     int i2 = 0;
-    while(i1<n1 && i2<n2){     
+    while(i1<n1 && i2<n2){
         if(l1[i1]==l2[i2]){
             i1+=1;
             i2+=1;
@@ -155,23 +155,24 @@ vector<int> Z2_polynom::LT(){
 }
 
 Z2_polynom Z2_polynom::reduce(vector<Z2_polynom> F){
-    N = this->N;
-    Z2_polynom p(N);
+    int n = this->N;
+    Z2_polynom p(n);
     p = *this;
-    Z2_polynom r(N);
+    Z2_polynom r(n);
 
-    Z2_polynom q(3);
-    Z2_polynom f0(3);
+    Z2_polynom q(n);
+    Z2_polynom f0(n);
 
     while(! p.is_null()){
         bool div = false;
+        Z2_polynom q(n);
         for(auto f:F){
             vector<int> LT_p = p.LT();
             vector<int> LT_f = f.LT();
             vector<int> monom_q;
             bool test = true;
             // we test if LT(p) is dividible by LT(f)
-            for(int k=0;k<N;k++){
+            for(int k=0;k<n;k++){
                 if(LT_p[k]<LT_f[k]){
                     test = false;
                 }
@@ -188,7 +189,7 @@ Z2_polynom Z2_polynom::reduce(vector<Z2_polynom> F){
             p = p + q*f0;
         }
         else{
-            Z2_polynom pol_LT_p(3);
+            Z2_polynom pol_LT_p(n);
             pol_LT_p.add_monom(p.LT());
             p = p + pol_LT_p;
             r = r + pol_LT_p;
@@ -216,7 +217,7 @@ Z2_polynom S_pol(Z2_polynom P1, Z2_polynom P2){
     Q1.add_monom(monom_Q1);
     Q2.add_monom(monom_Q2);
     Z2_polynom S(N);
-    S = Q1*P1 + Q2*P2;
+    S = (Q1*P1) + (Q2*P2);
     return S;    
 }
 
@@ -224,10 +225,11 @@ vector<Z2_polynom> Buchberger(vector<Z2_polynom> I){
     vector<Z2_polynom> E_0 = I;
     vector<Z2_polynom> E_1;
     bool is_grob_basis=false;
-    while(!is_grob_basis){
-        vector<Z2_polynom> E_1;
+    while(! is_grob_basis){
+        vector<Z2_polynom> E_1 {};
         int n = E_0.size();
         is_grob_basis = true;
+        cout<<n<<'\n';
         for(int i=0;i<n;i++){
             for(int j=i+1;j<n;j++){
                 Z2_polynom S = S_pol(E_0[i],E_0[j]);
@@ -235,15 +237,16 @@ vector<Z2_polynom> Buchberger(vector<Z2_polynom> I){
                 if(! S_red.is_null()){
                     is_grob_basis = false;
                     bool is_in = false;
-                    for (auto g:E_1)
-                        if(g==S_red) is_in == true;                    
-                    if(! is_in) E_1.push_back(S_red);
+                    for(auto g:E_1)
+                        if (S_red == g) is_in = true;
+                    if (! is_in) E_1.push_back(S_red);
                 }
             }
         }
         if(! is_grob_basis){
-            for(auto f:E_1)
-                E_0.push_back(f);            
+            for(auto f:E_1){
+                E_0.push_back(f);
+            }          
         }
     }
     return E_0;

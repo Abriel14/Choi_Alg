@@ -5,6 +5,9 @@
 
 using namespace std;
 
+
+
+
 vector<vector<int>> fusion(vector<vector<int>>,vector<vector<int>>);
 
 bool mon_order(vector<int>,vector<int>);
@@ -103,10 +106,38 @@ Z2_polynom Z2_polynom::operator*(const Z2_polynom &P){
     }
     return result;
 }
-Z2_polynom::~Z2_polynom(){
+
+void Z2_polynom::operator=(const Z2_polynom & P){
+    this->monoms = P.monoms;
+}
+
+bool Z2_polynom::operator>=(const Z2_polynom & P){
+    int n1 = this->monoms.size();
+    int n2 = P.monoms.size();
+    for(int k=0;k<min(n1,n2);k++){
+        if(mon_order(this->monoms[k],P.monoms[k]))
+            return true;
+        if(mon_order(P.monoms[k],this->monoms[k]))
+            return false;
+    }
+    return n1>=n2;
+}
+
+bool Z2_polynom::operator<(const Z2_polynom & P){
+    return !(*this >= P);
+}
+
+bool Z2_polynom::operator==(const Z2_polynom & P){
+    return this->N == P.N && this->monoms == P.monoms; 
 }
 
 
+Z2_polynom::~Z2_polynom(){
+}
+
+void Z2_polynom::add_monom(vector<int> monom){
+    this->monoms.push_back(monom);
+}
 
 void Z2_polynom::display_monoms(){
     for(vector<int> monom: this->monoms){
@@ -123,6 +154,101 @@ vector<int> Z2_polynom::LT(){
     return this->monoms[0];
 }
 
-Z2_polynom Z2_polynom::S_pol(const Z2_polynom & P){
-    vector<int> LT1
+Z2_polynom Z2_polynom::reduce(vector<Z2_polynom> F){
+    N = this->N;
+    Z2_polynom p(N);
+    p = *this;
+    Z2_polynom r(N);
+
+    Z2_polynom q(3);
+    Z2_polynom f0(3);
+
+    while(! p.is_null()){
+        bool div = false;
+        for(auto f:F){
+            vector<int> LT_p = p.LT();
+            vector<int> LT_f = f.LT();
+            vector<int> monom_q;
+            bool test = true;
+            // we test if LT(p) is dividible by LT(f)
+            for(int k=0;k<N;k++){
+                if(LT_p[k]<LT_f[k]){
+                    test = false;
+                }
+                monom_q.push_back(LT_p[k]-LT_f[k]);
+            }
+            if(test){
+                q.add_monom(monom_q);
+                f0 = f;
+                div = true;
+                break;
+            }
+        }
+        if(div){
+            p = p + q*f0;
+        }
+        else{
+            Z2_polynom pol_LT_p(3);
+            pol_LT_p.add_monom(p.LT());
+            p = p + pol_LT_p;
+            r = r + pol_LT_p;
+        }
+    }
+    return r;
+
+}
+
+Z2_polynom S_pol(Z2_polynom P1, Z2_polynom P2){
+    const int N = P1.N;
+    vector<int> LT1 = P1.LT();
+    vector<int> LT2 = P2.LT();
+    vector<int> PPCM;
+    vector<int> monom_Q1;
+    vector<int> monom_Q2;
+    // We create the two polynoms we will multiply P1 and P2 with
+    for(int k = 0;k<N;k++){
+        PPCM.push_back(max(LT1[k],LT2[k]));
+        monom_Q1.push_back(PPCM[k] - LT1[k]);
+        monom_Q2.push_back(PPCM[k] - LT2[k]);
+    }
+    Z2_polynom Q1(N);
+    Z2_polynom Q2(N);
+    Q1.add_monom(monom_Q1);
+    Q2.add_monom(monom_Q2);
+    Z2_polynom S(N);
+    S = Q1*P1 + Q2*P2;
+    return S;    
+}
+
+vector<Z2_polynom> Buchberger(vector<Z2_polynom> I){
+    vector<Z2_polynom> E_0 = I;
+    vector<Z2_polynom> E_1;
+    bool is_grob_basis=false;
+    while(!is_grob_basis){
+        vector<Z2_polynom> E_1;
+        int n = E_0.size();
+        is_grob_basis = true;
+        for(int i=0;i<n;i++){
+            for(int j=i+1;j<n;j++){
+                Z2_polynom S = S_pol(E_0[i],E_0[j]);
+                Z2_polynom S_red = S.reduce(E_0);
+                if(! S_red.is_null()){
+                    is_grob_basis = false;
+                    bool is_in = false;
+                    for (auto g:E_1)
+                        if(g==S_red) is_in == true;                    
+                    if(! is_in) E_1.push_back(S_red);
+                }
+            }
+        }
+        if(! is_grob_basis){
+            for(auto f:E_1)
+                E_0.push_back(f);            
+        }
+    }
+    return E_0;
+}
+
+vector<Z2_polynom> reduce_GB(vector<Z2_polynom> I){
+    return(I);
 }

@@ -107,6 +107,15 @@ Z2_polynom Z2_polynom::operator*(const Z2_polynom &P){
     return result;
 }
 
+Z2_polynom Z2_polynom::operator^(const int $n){
+    if($n==0){
+        return Z2_polynom(this->N,{{0,0,0}});
+    }
+    else{
+        return (*this) * (*this^($n-1));
+    }
+}
+
 void Z2_polynom::operator=(const Z2_polynom & P){
     this->monoms = P.monoms;
 }
@@ -116,9 +125,9 @@ bool Z2_polynom::operator>=(const Z2_polynom & P){
     int n2 = P.monoms.size();
     for(int k=0;k<min(n1,n2);k++){
         if(mon_order(this->monoms[k],P.monoms[k]))
-            return true;
-        if(mon_order(P.monoms[k],this->monoms[k]))
             return false;
+        if(mon_order(P.monoms[k],this->monoms[k]))
+            return true;
     }
     return n1>=n2;
 }
@@ -199,7 +208,42 @@ Z2_polynom Z2_polynom::reduce(vector<Z2_polynom> F){
 
 }
 
+Z2_polynom Z2_polynom::apply_permutation(vector<vector<int>> A){
+    // à corriger
+    Z2_polynom X(3,{{1,0,0}});
+    Z2_polynom Y(3,{{0,1,0}});
+    Z2_polynom Z(3,{{0,0,1}});
+    Z2_polynom new_X(3);
+    Z2_polynom new_Y(3);
+    Z2_polynom new_Z(3);
+    //we initiate the new variables
+    if(A[0][0]==1) new_X = new_X + X;
+    if(A[0][1]==1) new_X = new_X + Y;
+    if(A[0][2]==1) new_X = new_X + Z;
+    if(A[1][0]==1) new_Y = new_Y + X;
+    if(A[1][1]==1) new_Y = new_Y + Y;
+    if(A[1][2]==1) new_Y = new_Y + Z;
+    if(A[2][0]==1) new_Z = new_Z + X;
+    if(A[2][1]==1) new_Z = new_Z + Y;
+    if(A[2][2]==1) new_Z = new_Z + Z;
+
+    Z2_polynom new_P(3);
+
+    for(auto monom:this->monoms){
+        if(monom[0]!=0) new_P = new_P + (new_X^(monom[0]));
+        if(monom[1]!=0) new_P = new_P + (new_Y^(monom[1]));
+        if(monom[2]!=0) new_P = new_P + (new_Z^(monom[2]));
+    }
+    return(new_P);
+}
+
 Z2_polynom S_pol(Z2_polynom P1, Z2_polynom P2){
+    if(P1.is_null()){
+        return P2;
+    }
+    if(P2.is_null()){
+        return P1;
+    }
     const int N = P1.N;
     vector<int> LT1 = P1.LT();
     vector<int> LT2 = P2.LT();
@@ -229,7 +273,6 @@ vector<Z2_polynom> Buchberger(vector<Z2_polynom> I){
         vector<Z2_polynom> E_1 {};
         int n = E_0.size();
         is_grob_basis = true;
-        cout<<n<<'\n';
         for(int i=0;i<n;i++){
             for(int j=i+1;j<n;j++){
                 Z2_polynom S = S_pol(E_0[i],E_0[j]);
@@ -252,6 +295,46 @@ vector<Z2_polynom> Buchberger(vector<Z2_polynom> I){
     return E_0;
 }
 
-vector<Z2_polynom> reduce_GB(vector<Z2_polynom> I){
-    return(I);
+vector<Z2_polynom> reduce_GB(vector<Z2_polynom> GB){
+    // this returns a sorted reduced groebner basis
+    int n = GB[0].N;
+    // the first step is to minimize the Groebner basis
+    // for this we should delete every polynom that has its leading term
+    // dividible by the leading term of another polynom in the basis
+    bool one_is_divid = true;
+    while(one_is_divid){
+        one_is_divid=false;
+        for(int k=0;k<GB.size();k++){
+            for(int l=0;l<GB.size();l++){
+                if(k!=l){
+                    vector<int> LT1 = GB[k].LT();
+                    vector<int> LT2 = GB[k].LT();
+                    bool is_divid = true;
+                    // we see if LT1|LT2
+                    for(int m=0;m<n;m++){
+                        if(LT1[m]>LT2[m]) is_divid = false;
+                    }
+                    if(is_divid){
+                        one_is_divid = true;
+                        GB.erase(GB.begin()+l);
+                        break;
+                    }
+                }
+            }
+        if(one_is_divid) break;    
+        }
+    }
+
+    // the next step is to reduce the basis
+    // to do so, one must take one polynomial g in I
+    // and reduce g accordingly to I\{g}
+    for(int k=0;k<GB.size();k++){
+        vector<Z2_polynom> J = GB;
+        Z2_polynom g = GB[k];
+        J.erase(J.begin()+k);
+        Z2_polynom g_red = g.reduce(J);
+        GB[k] = g_red;
+    }
+    sort(GB.begin(),GB.end());
+    return(GB);
 }

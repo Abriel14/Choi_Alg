@@ -12,22 +12,18 @@
 using namespace std;
 
 vector<Z2_polynom> find_polynoms(vector<vector<int>>,vector<vector<int>>,vector<vector<int>>,vector<vector<int>>);
+vector<vector<vector<int>>> enumerate_GL3();
+bool compare_to_GB(vector<Z2_polynom>,vector<Z2_polynom>);
 
 vector<Z2_polynom> find_polynoms(vector<vector<int>> lambda_funct,vector<vector<int>> list_max_faces,vector<vector<int>> list_min_non_faces,vector<vector<int>> indexed_pentagon){
-    for(auto v:lambda_funct){
-        print_vect(v);
-    }
-    
+
     int n = lambda_funct[0].size();
     int m = lambda_funct.size();
     vector<int> ref_max_face(list_max_faces[0]);
     vector<int> compl_ref_max_face {indexed_pentagon[0][0], indexed_pentagon[1][0],indexed_pentagon[3][0]};
-    vector<vector<int>> monom_X {{1,0,0}};
-    vector<vector<int>> monom_Y {{0,1,0}};
-    vector<vector<int>> monom_Z {{0,0,1}};
-    Z2_polynom X(3,monom_X);
-    Z2_polynom Y(3,monom_Y);
-    Z2_polynom Z(3,monom_Z);
+    Z2_polynom X(3,{{1,0,0}});
+    Z2_polynom Y(3,{{0,1,0}});
+    Z2_polynom Z(3,{{0,0,1}});
 
     vector<Z2_polynom> reference_variables;
     
@@ -66,28 +62,95 @@ vector<Z2_polynom> find_polynoms(vector<vector<int>> lambda_funct,vector<vector<
     return(I);
 }
 
+vector<vector<vector<int>>> enumerate_GL3(){
+    vector<vector<int>> E {{0,0,1},{0,1,0},{1,0,0},{0,1,1},{1,0,1},{1,1,0},{1,1,1}};
+    vector<vector<vector<int>>> GL3;
+    for(int i= 0;i<7;i++){
+        for(int j = 0;j<7;j++){
+            if (i!=j){
+                vector<int> sum;
+                for(int r=0;r<3;r++) sum.push_back((E[i][r]+E[j][r])%2);
+                for(int k=0;k<7;k++){
+                    if (k != i && k!=j){
+                        if(E[k]!=sum) GL3.push_back(vector<vector<int>> {E[i],E[j],E[k]});
+                    }
+                }
+            }
+        }
+    }
+    return GL3;
+}
 
+vector<vector<vector<int>>> GL3 = enumerate_GL3();
+
+
+
+bool compare_to_GB(vector<Z2_polynom> I, vector<Z2_polynom> red_GB){
+    // compares an ideal with a reduce groebner basis
+    for(auto A:GL3){
+        vector<Z2_polynom> modified_I;
+        for(auto f:I){
+            modified_I.push_back(f.apply_permutation(A));
+        }
+        vector<Z2_polynom> GB_I = Buchberger(modified_I);
+        vector<Z2_polynom> red_Gb_I = reduce_GB(GB_I);
+        int n1 = red_GB.size();
+        int n2 = red_Gb_I.size();
+        if(n1==n2){
+            bool are_equal = true;
+            for(int k = 0;k<n1;k++){
+                if(! (red_Gb_I[k]==red_GB[k])){
+                    are_equal = false;
+                    break;
+                }
+            }
+            if(are_equal) return true;
+        }
+
+    }
+    return false;
+}
+
+vector<vector<int>> list_pentagon {{1,1,1,1,1}};
 
 
 int main(){
-    vector<int> pentagon1 {2,2,2,2,2};
-    vector<vector<int>> pentagon1_indexed = index_pentagon(pentagon1);
-    vector<vector<int>> max_faces = find_max_faces(pentagon1_indexed);
-    vector<vector<int>> min_non_faces = find_min_non_faces(pentagon1_indexed);
-    vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon1);
-    vector<Z2_polynom> I = find_polynoms(list_lambdas[1],max_faces,min_non_faces,pentagon1_indexed);
-    cout<<I.size()<<'\n';
-    for(auto P:I){
-        cout<<"new"<<'\n';
-        P.display_monoms();
-    }
-    cout <<"------------"<<'\n';
-    vector<Z2_polynom> J = Buchberger(I);
-    for(auto P:J){
-        cout<<"new"<<'\n';
-        P.display_monoms();
-    }
-    }
+    Z2_polynom P(3,{{1,1,0},{0,0,1}});
+    P = P.apply_permutation(vector<vector<int>> {{1,0,0},{0,1,0},{0,0,1}});
+    P.display_monoms();
+
+
+    // for(auto pentagon: list_pentagon){
+    //     vector<vector<int>> indexed_pentagon = index_pentagon(pentagon);
+    //     vector<vector<int>> max_faces = find_max_faces(indexed_pentagon);
+    //     vector<vector<int>> min_non_faces = find_min_non_faces(indexed_pentagon);
+    //     vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon);
+    //     cout<<list_lambdas.size()<<'\n';
+    //     vector<vector<int>> cohomology_classes {{0}};
+    //     vector<vector<Z2_polynom>> cohomology_classes_GB;
+    //     cohomology_classes_GB.push_back(reduce_GB(Buchberger(find_polynoms(list_lambdas[0],max_faces,min_non_faces,indexed_pentagon))));
+    //     for(int k = 1;k<list_lambdas.size();k++){
+    //         vector<Z2_polynom> I = find_polynoms(list_lambdas[k],max_faces,min_non_faces,indexed_pentagon);
+    //         bool is_cohomolog = false;
+    //         for(int l=0;l<cohomology_classes.size();l++){
+    //             if (compare_to_GB(I,cohomology_classes_GB[l])){
+    //                 // if this ideal has the same groebner basis than the one in the cohomology class, then we had it to this class
+    //                 is_cohomolog = true;
+    //                 cohomology_classes[l].push_back(k);
+    //                 break;
+    //             }
+    //         }
+    //         if(! is_cohomolog){
+    //             cohomology_classes.push_back(vector<int> {k});
+    //             cohomology_classes_GB.push_back(reduce_GB(Buchberger(find_polynoms(list_lambdas[k],max_faces,min_non_faces,indexed_pentagon))));
+    //         }
+    //     }
+    //     for(auto cohomology_class:cohomology_classes){
+    //         cout<<"new"<<'\n';
+    //         print_vect(cohomology_class);
+    //     }
+    // }
+}
 
 
 

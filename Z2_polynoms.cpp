@@ -28,7 +28,7 @@ bool mon_order(vector<int> mon1,vector<int> mon2){
         while( k>=0 && (mon1[k] - mon2[k]==0)){
             k-=1;
         }
-        return k>=0 && (mon1[k] - mon2[k] < 0);
+        return (k>=0 && (mon1[k] - mon2[k] < 0));
         }
     }
 
@@ -89,8 +89,9 @@ Z2_polynom Z2_polynom::operator+(const Z2_polynom &P){
 
 
 Z2_polynom Z2_polynom::operator*(const Z2_polynom &P){
-    vector<vector<int>> mult_result;
     int n = this->N;
+    if(this->is_null()) return Z2_polynom(n);
+    vector<vector<int>> mult_result;
     Z2_polynom result(n,mult_result);
     for(vector<int> monom: this->monoms){
         vector<vector<int>> list_multiplied_monoms;
@@ -216,7 +217,7 @@ Z2_polynom Z2_polynom::apply_permutation(vector<vector<int>> A){
     Z2_polynom new_X(3);
     Z2_polynom new_Y(3);
     Z2_polynom new_Z(3);
-    //we initiate the new variables
+    //we initialize the new variables
     if(A[0][0]==1) new_X = new_X + X;
     if(A[0][1]==1) new_X = new_X + Y;
     if(A[0][2]==1) new_X = new_X + Z;
@@ -230,9 +231,10 @@ Z2_polynom Z2_polynom::apply_permutation(vector<vector<int>> A){
     Z2_polynom new_P(3);
 
     for(auto monom:this->monoms){
-        if(monom[0]!=0) new_P = new_P + (new_X^(monom[0]));
-        if(monom[1]!=0) new_P = new_P + (new_Y^(monom[1]));
-        if(monom[2]!=0) new_P = new_P + (new_Z^(monom[2]));
+        Z2_polynom new_monom_P(3);
+        new_monom_P.add_monom(vector<int> {0,0,0});
+        new_monom_P = new_monom_P * (new_X^(monom[0]))* (new_Y^(monom[1]))* (new_Z^(monom[2]));
+        new_P = new_P + new_monom_P;
     }
     return(new_P);
 }
@@ -308,7 +310,7 @@ vector<Z2_polynom> reduce_GB(vector<Z2_polynom> GB){
             for(int l=0;l<GB.size();l++){
                 if(k!=l){
                     vector<int> LT1 = GB[k].LT();
-                    vector<int> LT2 = GB[k].LT();
+                    vector<int> LT2 = GB[l].LT();
                     bool is_divid = true;
                     // we see if LT1|LT2
                     for(int m=0;m<n;m++){
@@ -321,10 +323,9 @@ vector<Z2_polynom> reduce_GB(vector<Z2_polynom> GB){
                     }
                 }
             }
-        if(one_is_divid) break;    
+        if(one_is_divid) break;  
         }
     }
-
     // the next step is to reduce the basis
     // to do so, one must take one polynomial g in I
     // and reduce g accordingly to I\{g}

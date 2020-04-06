@@ -111,45 +111,77 @@ bool compare_to_GB(vector<Z2_polynom> I, vector<Z2_polynom> red_GB){
     return false;
 }
 
-vector<vector<int>> list_pentagon {{1,1,1,1,1}};
+vector<vector<int>> list_pentagon {{3,1,1,1,1}};
 
 
 int main(){
-    Z2_polynom P(3,{{1,1,0},{0,0,1}});
-    P = P.apply_permutation(vector<vector<int>> {{1,0,0},{0,1,0},{0,0,1}});
-    P.display_monoms();
+    // vector<vector<int>> indexed_pentagon = index_pentagon({3,1,1,1,1});
+    // vector<vector<int>> max_faces = find_max_faces(indexed_pentagon);
+    // vector<vector<int>> min_non_faces = find_min_non_faces(indexed_pentagon);
+    // vector<vector<vector<int>>> list_lambdas = compute_chr_funct({3,1,1,1,1});
+    // vector<Z2_polynom> I = find_polynoms(list_lambdas[0],max_faces,min_non_faces,indexed_pentagon);
+    // vector<Z2_polynom> GB = Buchberger(I);
 
-
-    // for(auto pentagon: list_pentagon){
-    //     vector<vector<int>> indexed_pentagon = index_pentagon(pentagon);
-    //     vector<vector<int>> max_faces = find_max_faces(indexed_pentagon);
-    //     vector<vector<int>> min_non_faces = find_min_non_faces(indexed_pentagon);
-    //     vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon);
-    //     cout<<list_lambdas.size()<<'\n';
-    //     vector<vector<int>> cohomology_classes {{0}};
-    //     vector<vector<Z2_polynom>> cohomology_classes_GB;
-    //     cohomology_classes_GB.push_back(reduce_GB(Buchberger(find_polynoms(list_lambdas[0],max_faces,min_non_faces,indexed_pentagon))));
-    //     for(int k = 1;k<list_lambdas.size();k++){
-    //         vector<Z2_polynom> I = find_polynoms(list_lambdas[k],max_faces,min_non_faces,indexed_pentagon);
-    //         bool is_cohomolog = false;
-    //         for(int l=0;l<cohomology_classes.size();l++){
-    //             if (compare_to_GB(I,cohomology_classes_GB[l])){
-    //                 // if this ideal has the same groebner basis than the one in the cohomology class, then we had it to this class
-    //                 is_cohomolog = true;
-    //                 cohomology_classes[l].push_back(k);
-    //                 break;
-    //             }
-    //         }
-    //         if(! is_cohomolog){
-    //             cohomology_classes.push_back(vector<int> {k});
-    //             cohomology_classes_GB.push_back(reduce_GB(Buchberger(find_polynoms(list_lambdas[k],max_faces,min_non_faces,indexed_pentagon))));
-    //         }
-    //     }
-    //     for(auto cohomology_class:cohomology_classes){
-    //         cout<<"new"<<'\n';
-    //         print_vect(cohomology_class);
-    //     }
+    // vector<Z2_polynom> GB_red = reduce_GB(GB);
+    // for(auto f:GB_red){
+    //     cout<<"new"<<'\n';
+    //     f.display_monoms();
     // }
+
+
+    for(auto pentagon: list_pentagon){
+        vector<vector<int>> indexed_pentagon = index_pentagon(pentagon);
+        vector<vector<int>> max_faces = find_max_faces(indexed_pentagon);
+        vector<vector<int>> min_non_faces = find_min_non_faces(indexed_pentagon);
+        vector<vector<vector<int>>> list_lambdas = compute_chr_funct(pentagon);
+        cout<<list_lambdas.size()<<'\n';
+        vector<vector<int>> cohomology_classes {{0}};
+        vector<vector<vector<Z2_polynom>>> cohomology_classes_GB;
+        cohomology_classes_GB.push_back({});
+        vector<Z2_polynom> I = find_polynoms(list_lambdas[0],max_faces,min_non_faces,indexed_pentagon);
+        for(auto A:GL3){
+            vector<Z2_polynom> modified_I;
+            for(auto f:I){
+                modified_I.push_back(f.apply_permutation(A));
+            }
+            vector<Z2_polynom> GB_I = Buchberger(modified_I);
+            vector<Z2_polynom> red_Gb_I = reduce_GB(GB_I);
+            cohomology_classes_GB[0].push_back(red_Gb_I);
+        }
+        for(int k = 1;k<list_lambdas.size();k++){
+            vector<Z2_polynom> I = find_polynoms(list_lambdas[k],max_faces,min_non_faces,indexed_pentagon);
+            vector<Z2_polynom> GB_I = Buchberger(I);
+            vector<Z2_polynom> red_GB_I = reduce_GB(GB_I);
+            bool is_cohomolog = false;
+            for(int l=0;l<cohomology_classes.size();l++){
+                for(int m=0;m<cohomology_classes_GB[l].size();m++){
+                    are_equal
+                    if(red_GB_I == cohomology_classes_GB[l][m]){
+                        is_cohomolog = true;
+                        cohomology_classes[l].push_back(k);
+                        break;
+                    }
+                }
+                if(is_cohomolog) break;
+            }
+            if(! is_cohomolog){
+                cohomology_classes.push_back(vector<int> {k});
+                for(auto A:GL3){
+                    vector<Z2_polynom> modified_I;
+                    for(auto f:I){
+                        modified_I.push_back(f.apply_permutation(A));
+                    }
+                    vector<Z2_polynom> GB_I = Buchberger(modified_I);
+                    vector<Z2_polynom> red_Gb_I = reduce_GB(GB_I);
+                    cohomology_classes_GB[cohomology_classes.size()-1].push_back(red_Gb_I);
+                }
+            }
+        }
+        for(auto cohomology_class:cohomology_classes){
+            cout<<"new"<<'\n';
+            print_vect(cohomology_class);
+        }
+    }
 }
 
 

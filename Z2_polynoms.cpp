@@ -209,7 +209,7 @@ Z2_polynom Z2_polynom::reduce(vector<Z2_polynom> F){
 
 }
 
-Z2_polynom Z2_polynom::apply_permutation(vector<vector<int>> A){
+Z2_polynom Z2_polynom::apply_permutation(vector<vector<bool>> A){
     // à corriger
     Z2_polynom X(3,{{1,0,0}});
     Z2_polynom Y(3,{{0,1,0}});
@@ -218,15 +218,15 @@ Z2_polynom Z2_polynom::apply_permutation(vector<vector<int>> A){
     Z2_polynom new_Y(3);
     Z2_polynom new_Z(3);
     //we initialize the new variables
-    if(A[0][0]==1) new_X = new_X + X;
-    if(A[0][1]==1) new_X = new_X + Y;
-    if(A[0][2]==1) new_X = new_X + Z;
-    if(A[1][0]==1) new_Y = new_Y + X;
-    if(A[1][1]==1) new_Y = new_Y + Y;
-    if(A[1][2]==1) new_Y = new_Y + Z;
-    if(A[2][0]==1) new_Z = new_Z + X;
-    if(A[2][1]==1) new_Z = new_Z + Y;
-    if(A[2][2]==1) new_Z = new_Z + Z;
+    if(A[0][0]) new_X = new_X + X;
+    if(A[0][1]) new_X = new_X + Y;
+    if(A[0][2]) new_X = new_X + Z;
+    if(A[1][0]) new_Y = new_Y + X;
+    if(A[1][1]) new_Y = new_Y + Y;
+    if(A[1][2]) new_Y = new_Y + Z;
+    if(A[2][0]) new_Z = new_Z + X;
+    if(A[2][1]) new_Z = new_Z + Y;
+    if(A[2][2]) new_Z = new_Z + Z;
 
     Z2_polynom new_P(3);
 

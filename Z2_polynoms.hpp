@@ -23,7 +23,7 @@ public:
     bool operator==(const Z2_polynom & P);
     bool is_null();
     vector<int> LT();
-    Z2_polynom apply_permutation(vector<vector<int>> P);
+    Z2_polynom apply_permutation(vector<vector<bool>> P);
     Z2_polynom reduce(vector<Z2_polynom> F);
     Z2_polynom S_pol(Z2_polynom P1, Z2_polynom P2);
     vector<Z2_polynom> Buchberger(vector<Z2_polynom> I);

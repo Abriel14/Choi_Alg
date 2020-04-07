@@ -9,7 +9,7 @@
 using namespace std;
 
 int thread_nbr = 8;
-vector<vector<int>> S;
+vector<vector<bool>> S;
 
 
 void print_vect(vector<int> v){
@@ -19,36 +19,36 @@ void print_vect(vector<int> v){
   cout<<'\n';
 }
 
-void list_non_zero_elements(int i, vector<int> element){
+void list_non_zero_elements(int i, vector<bool> element){
   if(i==element.size()){
-    if(sum(element)!=0){
+    if(sum(element)){
       S.push_back(element);
     }
   }
   else{
-    vector<int> element1(element), element2(element);
-    element1[i] +=1;
+    vector<bool> element1(element), element2(element);
+    element1[i] = true;
     list_non_zero_elements(i+1, element1);
     list_non_zero_elements(i+1, element2);
   }
 }
 
-int sum(vector<int> v){
-  int summand = 0;
+int sum(vector<bool> v){
+  bool summand = false;
   for(int k : v)
-    summand += k;
+    summand = summand || k;
   return summand;
 }
 
-vector<int> sum_v(vector<int> v1,vector<int> v2){
-  vector<int> sum_vector;
+vector<bool> sum_v(vector<bool> v1,vector<bool> v2){
+  vector<bool> sum_vector;
   for(int k=0; k<v1.size();k++)
-    sum_vector.push_back((v1[k] + v2[k])%2);
+    sum_vector.push_back(v1[k] ^ v2[k]);
   return sum_vector;
 }
 
 bool is_in(int x, vector<int> v){
-  for(int k:v){
+  for(auto k:v){
     if(k==x)
       return true;
     }
@@ -106,7 +106,7 @@ vector<vector<int>> find_min_non_faces(vector<vector<int>> indexed_pentagon){
   return min_non_faces;
 }
 
-void remove_all_lin_span(vector<vector<int>>& T,vector<vector<int>> list_vectors, vector<int> lin_span){
+void remove_all_lin_span(vector<vector<bool>>& T,vector<vector<bool>> list_vectors, vector<bool> lin_span){
   //Given a list of vectors, this function erases from this list every Z2 linear spans of it.
   if(list_vectors.size()==0){
     int n = (T).size();
@@ -119,27 +119,27 @@ void remove_all_lin_span(vector<vector<int>>& T,vector<vector<int>> list_vectors
   }
   else
   {
-    vector<int> v(list_vectors.back());
+    vector<bool> v(list_vectors.back());
     list_vectors.pop_back();
     remove_all_lin_span(T,list_vectors,lin_span);
     remove_all_lin_span(T,list_vectors,sum_v(v,lin_span));
   }
 }
 
-vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
+vector<vector<vector<bool>>> compute_chr_funct(vector<int> pentagon){
 
   vector<vector<int>> indexed_pentagon = index_pentagon(pentagon);
   vector<vector<int>> min_non_faces = find_min_non_faces(indexed_pentagon);
   vector<vector<int>> max_faces = find_max_faces(indexed_pentagon);
 
-  vector<vector<vector<int>>> list_lambdas;
+  vector<vector<vector<bool>>> list_lambdas;
 
-  int m=indexed_pentagon[4].back()+1;//the number of verticesA. GARRISON AND R. SCOTT
+  int m=indexed_pentagon[4].back()+1;//the number of vertices
   int n = m-3;//dimension of the polytope
 
   //creation of the null vector
-  vector<int> null_v;
-  null_v.assign(n,0);
+  vector<bool> null_v;
+  null_v.assign(n,false);
   list_non_zero_elements(0,null_v);
 
   //the reference maximal face (we put the canonical basis in the rows of the characterisic function)
@@ -147,16 +147,16 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
   vector<int> compl_ref_max_face {indexed_pentagon[0][0], indexed_pentagon[1][0],indexed_pentagon[3][0]};
 
   //We create the template for the characteristic function
-  vector<vector<int>> lambda_template;
+  vector<vector<bool>> lambda_template;
   lambda_template.assign(m,null_v);
   for(int k=0; k<n;k++){
     lambda_template[ref_max_face[k]][k] = 1;
     }
   
-  vector<vector<int>> lambda(lambda_template);
-  vector<vector<vector<int>>> list_S;//list of all the possibilities for the three vectors
+  vector<vector<bool>> lambda(lambda_template);
+  vector<vector<vector<bool>>> list_S;//list of all the possibilities for the three vectors
   for(auto k:compl_ref_max_face){
-    vector<vector<int>> S_cp(S);
+    vector<vector<bool>> S_cp(S);
     list_S.push_back(S_cp);
   }
   int i = 0;
@@ -175,11 +175,11 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
         //if they are not in the max face then the conditions are satisfied
         if(others_are_not){
           //we create the list of the vectors we will remove the span in the list list_S[i]
-          vector<vector<int>> list_vectors;
+          vector<vector<bool>> list_vectors;
           for(int k:max_face){
             //if the index is not the one of the treating vector (it must be linearly independant from the ones in the max face which contains it),
             if(k!=compl_ref_max_face[i]){
-              vector<int> vect_to_add(lambda[k]);
+              vector<bool> vect_to_add(lambda[k]);
               list_vectors.push_back(vect_to_add);
               }
             }
@@ -194,8 +194,9 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
       list_S[i].pop_back();
       //if it is the last possible vector to add, it means we just should fill lambda with the working vectors
       if(i==2){
-        vector<vector<int>> lambda_ins(lambda);
+        vector<vector<bool>> lambda_ins(lambda);
         list_lambdas.push_back(lambda_ins);
+        cout<<list_lambdas.size()<<'\n';
         }
       //otherwise, we must analyze the next vector possible according to the one we put just before
       else{
@@ -207,6 +208,7 @@ vector<vector<vector<int>>> compute_chr_funct(vector<int> pentagon){
     if(list_S[i].size()==0){
       list_S[i] = S;
       i=i-1;
+      
       }
     }
   return list_lambdas;

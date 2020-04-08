@@ -111,7 +111,7 @@ bool compare_to_GB(vector<Z2_polynom> I, vector<Z2_polynom> red_GB){
     return false;
 }
 
-vector<vector<int>> list_pentagon {{3,3,3,3,3}};
+vector<vector<int>> list_pentagon {{2,2,2,2,2}};
 
 
 int main(){

@@ -16,7 +16,7 @@ public:
     ~Z2_polynom();
     Z2_polynom operator+(const Z2_polynom & P);
     Z2_polynom operator*(const Z2_polynom & P);
-    Z2_polynom operator^(const int $n);
+    Z2_polynom operator^(const int n);
     void operator=(const Z2_polynom & P);
     bool operator>=(const Z2_polynom & P);
     bool operator<(const Z2_polynom & P);

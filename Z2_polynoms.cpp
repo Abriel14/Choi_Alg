@@ -108,12 +108,12 @@ Z2_polynom Z2_polynom::operator*(const Z2_polynom &P){
     return result;
 }
 
-Z2_polynom Z2_polynom::operator^(const int $n){
-    if($n==0){
+Z2_polynom Z2_polynom::operator^(const int n){
+    if(n==0){
         return Z2_polynom(this->N,{{0,0,0}});
     }
     else{
-        return (*this) * (*this^($n-1));
+        return (*this) * (*this^(n-1));
     }
 }
 
